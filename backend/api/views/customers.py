@@ -21,3 +21,15 @@ class CustomerViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(customer)
         return Response(serializer.data)
     
+    @action(detail=False, methods=['patch'])
+    def update_current_user(self, request):
+        """Allows the logged-in user to update their profile"""
+        customer = get_object_or_404(LoanCustomer, user=request.user)
+        serializer = self.get_serializer(customer, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=400)
+    
