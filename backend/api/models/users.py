@@ -7,12 +7,14 @@ class LoanProvider(models.Model):
     fund_amount = models.DecimalField(
         max_digits=12, 
         decimal_places=2, 
-        help_text='Funds available for loan taking.'
+        help_text='Funds available for loan taking.',
+        default=0.0
     ) 
     wallet_amount = models.DecimalField(
         max_digits=12, 
         decimal_places=2,
-        help_text='Earnings from paid back loans.'
+        help_text='Earnings from paid back loans.',
+        default=0.0
     )
     
     def __str__(self):

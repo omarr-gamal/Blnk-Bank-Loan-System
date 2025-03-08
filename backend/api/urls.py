@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LoanViewSet, PaymentViewSet, CustomerViewSet
+from .views import LoanViewSet, PaymentViewSet, CustomerViewSet, ProviderViewSet
 
 router = DefaultRouter()
 router.register(r'loans', LoanViewSet, basename='loan')
 router.register(r'customers', CustomerViewSet, basename='loancustomer')
+router.register(r'providers', ProviderViewSet, basename='loanprovider')
 router.register(r'payments', PaymentViewSet, basename='payment')
 
 urlpatterns = [
