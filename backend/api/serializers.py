@@ -29,9 +29,21 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class CustomerSerializer(serializers.Serializer):
+class CustomerSerializer(serializers.HyperlinkedModelSerializer):
+    first_name = serializers.CharField(source="user.first_name", required=False)
+    last_name = serializers.CharField(source="user.last_name", required=False)
+
     class Meta:
         model = LoanCustomer
-        fields = '__all__'
-        # read_only_fields = ['min_loan_amount', 'max_loan_amount']
+        fields = ['id', 'url', 'min_loan_amount', 'max_loan_amount', 'first_name', 'last_name']
+        read_only_fields = ['id', 'min_loan_amount', 'max_loan_amount']
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        user = instance.user
         
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        return super().update(instance, validated_data)
