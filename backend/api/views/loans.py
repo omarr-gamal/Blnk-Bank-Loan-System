@@ -3,8 +3,8 @@ from django.db.models import F
 
 from rest_framework import viewsets, serializers, permissions
 
-from .models import Loan, Payment, LoanFunding, LoanProvider, LoanCustomer, BankConfig
-from .serializers import LoanSerializer, PaymentSerializer, LoanFundingSerializer
+from api.models import Loan, LoanFunding, LoanProvider, LoanCustomer, BankConfig
+from api.serializers import LoanSerializer
 
 
 class LoanViewSet(viewsets.ModelViewSet):
@@ -50,12 +50,3 @@ class LoanViewSet(viewsets.ModelViewSet):
                 LoanFunding.objects.create(loan=loan, provider=provider_locked, amount=allocation)
                 provider_locked.fund_amount = F('fund_amount') - allocation
                 provider_locked.save()
-
-
-class LoanFundingViewSet(viewsets.ModelViewSet):
-    queryset = LoanFunding.objects.all()
-    serializer_class = LoanFundingSerializer
-
-class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer

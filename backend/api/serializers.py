@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Loan, Payment, LoanFunding
+from .models import Loan, Payment, LoanFunding, LoanCustomer
 
 class LoanSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -27,3 +27,11 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Payment
         fields = '__all__'
+
+
+class CustomerSerializer(serializers.Serializer):
+    class Meta:
+        model = LoanCustomer
+        fields = '__all__'
+        # read_only_fields = ['min_loan_amount', 'max_loan_amount']
+        

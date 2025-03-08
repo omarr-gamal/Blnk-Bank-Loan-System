@@ -14,9 +14,15 @@ class LoanProvider(models.Model):
         decimal_places=2,
         help_text='Earnings from paid back loans.'
     )
+    
+    def __str__(self):
+        return self.user.username
 
 
 class LoanCustomer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     min_loan_amount = models.DecimalField(max_digits=12, decimal_places=2)
     max_loan_amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return self.user.username
