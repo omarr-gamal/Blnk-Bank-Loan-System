@@ -67,3 +67,6 @@ class ProviderSerializer(serializers.HyperlinkedModelSerializer):
         user.save()
 
         return super().update(instance, validated_data)
+
+class AddFundsSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
