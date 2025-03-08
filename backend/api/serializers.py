@@ -4,7 +4,8 @@ from .models import Loan, Payment, LoanFunding
 class LoanSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Loan
-        fields = '__all__'
+        fields = ['url', 'amount', 'duration', 'interest_rate', 'created_at']
+        read_only_fields = ['duration', 'interest_rate', 'created_at']
 
 class LoanFundingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
