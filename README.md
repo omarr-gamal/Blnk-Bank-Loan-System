@@ -94,7 +94,7 @@ Stores global rules like minimum and maximum amounts, interest rate, and loan du
 ### Customers
 
 - `GET /api/customers/` - List customers.
-- `PATCH /api/customers/me/` - Update the logged-in customer's profile.
+- `PATCH /api/customers/update_current/` - Update the logged-in customer's profile.
 
 ### Loans
 
@@ -110,6 +110,7 @@ Stores global rules like minimum and maximum amounts, interest rate, and loan du
 ### Providers
 
 - `POST /api/providers/add_funds/` - Add funds to a provider wallet.
+- `PATCH /api/providers/update_current/` - Update the logged-in provider's profile.
 
 ### Bank Configuration
 
