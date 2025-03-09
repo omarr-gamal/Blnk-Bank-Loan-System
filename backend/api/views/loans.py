@@ -22,13 +22,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         if amount < customer.min_loan_amount or amount > customer.max_loan_amount:
             raise serializers.ValidationError(f"Loan amount not within allowed range. Min: {customer.min_loan_amount}, Max: {customer.max_loan_amount}")
         
-        rate = BankConfig.objects.get().interest_rate
-        duration = BankConfig.objects.get().duration
-        
         serializer.validated_data['customer'] = customer
-        serializer.validated_data['interest_rate'] = rate
-        serializer.validated_data['duration'] = duration
-    
         loan = serializer.save()
         
         try:

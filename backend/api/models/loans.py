@@ -1,7 +1,10 @@
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from django.db import models
 from django.db.models import Sum
 
-from api.models.users import LoanCustomer, LoanProvider
+from api.models.users import LoanCustomer, LoanProvider, BankConfig
 
 
 class Loan(models.Model):
@@ -47,6 +50,11 @@ class Loan(models.Model):
         
     def __str__(self):
         return f"Loan {self.id} - {self.amount} ({self.get_status_display()})"
+
+@receiver(pre_save, sender=Loan)
+def set_default_loan_limits(sender, instance: Loan, **kwargs):
+    instance.duration = BankConfig.get_config().duration
+    instance.interest_rate = BankConfig.get_config().interest_rate
 
 
 class LoanFunding(models.Model):

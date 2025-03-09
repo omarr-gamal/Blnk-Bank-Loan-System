@@ -1,5 +1,9 @@
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
+
+from .bank_config import BankConfig
 
 
 class LoanProvider(models.Model):
@@ -28,3 +32,8 @@ class LoanCustomer(models.Model):
 
     def __str__(self):
         return self.user.username
+
+@receiver(pre_save, sender=LoanCustomer)
+def set_default_customer_limits(sender, instance: LoanCustomer, **kwargs):
+    instance.min_loan_amount = BankConfig.get_config().min_loan_amount
+    instance.max_loan_amount = BankConfig.get_config().max_loan_amount
