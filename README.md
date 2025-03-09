@@ -39,22 +39,6 @@ These tasks were omitted to focus on core loan management functionality, and als
 - Currency conversion and exchange rate handling.
 - Detailed user profile management beyond basic information.
 
-## Design Choices
-
-### **1. Separate Services for Business Logic**
-
-- **`LoanFundAllocator`**: Handles loan funding by distributing available funds from providers.
-- **`PaymentProcessor`**: Handles loan repayments and updates provider wallet balances.
-
-### **2. Atomic Transactions**
-
-- Loan funding and repayment operations are wrapped in transactions to ensure data consistency.
-
-### **3. Read-Optimized API Design**
-
-- API responses include computed fields (`remaining_balance`, `amount_due`, `total_paid`) for convenience.
-- A single `BankConfig` instance is exposed via a dedicated read-only API.
-
 ## Future Improvements
 
 These are great additions I found no time to implement:
@@ -83,53 +67,27 @@ The F() expression is used to atomically update fields in place. So as to preven
 
 Represents customers who can request loans.
 
-- Linked to a Django `User` model.
-- Defines min/max loan amounts for the customer.
-
 ### 2. LoanProvider
 
 Represents entities that provide funds for loans.
-
-- Each provider has a wallet balance used for funding loans.
 
 ### 3. Loan
 
 Tracks loans requested by customers.
 
 - Stores amount, duration, interest rate, and status.
-- Uses `related_name='loans'` to allow querying loans by customer.
 
 ### 4. LoanFunding
 
-Records funding transactions between providers and loans.
+Records funding participations between providers and loans.
 
 ### 5. Payment
 
 Tracks loan repayments by customers.
 
-- Uses `related_name='payments'` to link payments to a loan.
-- Payments reduce outstanding balances and update provider wallets.
-
 ### 6. BankConfig
 
-Stores global loan rules like minimum and maximum amounts, interest rate, and loan duration.
-
-## Services
-
-### 1. **PaymentProcessor**
-
-Handles loan repayments:
-
-- Creates payment records.
-- Updates loan balance.
-- Adjusts provider wallets.
-
-### 2. **LoanFundAllocator**
-
-Manages loan funding:
-
-- Allocates funds from providers.
-- Ensures loan funding rules are followed.
+Stores global rules like minimum and maximum amounts, interest rate, and loan duration.
 
 ## API Endpoints
 
@@ -156,33 +114,3 @@ Manages loan funding:
 ### Bank Configuration
 
 - `GET /api/bank_configuration/` - Retrieve global loan settings.
-
-## Database Transactions
-
-- Loan payments and provider wallet updates are handled within **atomic transactions** to ensure consistency.
-
-## Security & Permissions
-
-- Customers can only access their own loans and payments.
-- Loan providers can only manage their own funds.
-- Bank configuration is read-only via API.
-
-## Future Enhancements
-
-- Implement interest accrual on unpaid balances.
-- Add loan repayment schedules.
-- Introduce notifications for due payments.
-- Extend the funding system to support multiple providers per loan.
-
-This README provides an overview of the system's design and functionality, ensuring clarity on how the platform operates.
-
-
-***************************************************************************************************************************************************
-# Loan Management System
-
-## Overview
-This system facilitates loan processing, from funding by providers to repayment by customers. The design ensures financial integrity, efficient loan allocation, and proper tracking of transactions.
-
-
-
-
