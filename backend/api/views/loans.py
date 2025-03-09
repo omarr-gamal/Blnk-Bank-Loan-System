@@ -1,10 +1,10 @@
-from django.db import transaction
-from django.db.models import F
-
 from rest_framework import viewsets, serializers, permissions
+from rest_framework.response import Response
+from rest_framework import status
 
-from api.models import Loan, LoanFunding, LoanProvider, LoanCustomer, BankConfig
+from api.models import Loan, LoanCustomer, BankConfig
 from api.serializers import LoanSerializer
+from api.services import LoanFundAllocator
 
 
 class LoanViewSet(viewsets.ModelViewSet):
@@ -22,30 +22,19 @@ class LoanViewSet(viewsets.ModelViewSet):
         if amount < customer.min_loan_amount or amount > customer.max_loan_amount:
             raise serializers.ValidationError(f"Loan amount not within allowed range. Min: {customer.min_loan_amount}, Max: {customer.max_loan_amount}")
         
-        with transaction.atomic():
-            rate = BankConfig.objects.get().interest_rate
-            duration = BankConfig.objects.get().duration
-            loan = serializer.save(customer=customer, interest_rate=rate, duration=duration)
-            
-            remaining = loan.amount
-            allocations = []
-
-            for provider in LoanProvider.objects.filter(fund_amount__gt=0).order_by('id'):
-                # Lock this provider row to use its funds.
-                provider_locked = LoanProvider.objects.select_for_update().get(pk=provider.pk)
-                available = provider_locked.fund_amount
-                if available > 0:
-                    allocation = min(available, remaining)
-                    allocations.append((provider_locked, allocation))
-                    remaining -= allocation
-                if remaining <= 0:
-                    break
-
-            if remaining > 0:
-                raise serializers.ValidationError("Not enough provider funds available.")
-
-            # Update locked rows and create funding records.
-            for provider_locked, allocation in allocations:
-                LoanFunding.objects.create(loan=loan, provider=provider_locked, amount=allocation)
-                provider_locked.fund_amount = F('fund_amount') - allocation
-                provider_locked.save()
+        rate = BankConfig.objects.get().interest_rate
+        duration = BankConfig.objects.get().duration
+        
+        serializer.validated_data['customer'] = customer
+        serializer.validated_data['interest_rate'] = rate
+        serializer.validated_data['duration'] = duration
+    
+        loan = serializer.save()
+        
+        try:
+            LoanFundAllocator.fulfil_loan(loan=loan)
+        except ValueError as e:
+            loan.delete()
+            raise serializers.ValidationError(str(e))
+ 
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

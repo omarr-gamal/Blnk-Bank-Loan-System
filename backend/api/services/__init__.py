@@ -1,1 +1,2 @@
 from .payment_processor import PaymentProcessor
+from .loan_fund_allocator import LoanFundAllocator
