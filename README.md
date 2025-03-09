@@ -115,3 +115,87 @@ Stores global rules like minimum and maximum amounts, interest rate, and loan du
 ### Bank Configuration
 
 - `GET /api/bank_configuration/` - Retrieve global loan settings.
+
+## Getting the App Running
+
+To get the loan management platform up and running locally and start interacting with the API, follow these steps:
+
+### 1. Clone the Repository
+
+First, clone the project repository to your local machine:
+
+```bash
+git clone <repository-url>
+cd <project-directory>
+```
+
+### 2. Set Up the Environment
+
+Ensure you have Python 3.8 or higher installed, along with pip for managing dependencies.
+
+- Create a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+- Activate the virtual environment:
+
+  - On Windows:
+
+    ```bash
+    venv\Scripts\activate
+    ```
+
+  - On macOS/Linux:
+
+    ```bash
+    source venv/bin/activate
+    ```
+
+### 3. Install Dependencies
+
+Install the required dependencies by running:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Set Up the Database
+
+Run database migrations using:
+
+```bash
+python manage.py migrate
+```
+
+### 5. Create a Superuser (Admin User)
+
+To access the Django admin panel and interact with the system, create a superuser:
+
+```bash
+python manage.py createsuperuser
+```
+
+Follow the prompts to set up a username, email, and password.
+
+### 6. Start the Development Server
+
+Run the following command to start the Django development server:
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+
+The app will be available at `http://127.0.0.1:8000/`.
+
+### 7. Interact with the API
+
+Go to `http://localhost:8000/api/` and start playing aroung with the api.
+
+### 8. Access the Admin Panel (Optional)
+
+You can also log in to the Django admin panel for easier management of data.
+
+- Go to `http://localhost:8000/admin/` in your browser.
+- Log in using the superuser credentials you created earlier.
