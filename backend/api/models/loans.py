@@ -45,10 +45,6 @@ class Loan(models.Model):
 
         self.save()
         
-        if previous_status != Loan.Status.PAID and self.status == Loan.Status.PAID:
-            # TODO: Update provider wallet amounts.
-            pass
-
     def __str__(self):
         return f"Loan {self.id} - {self.amount} ({self.get_status_display()})"
 

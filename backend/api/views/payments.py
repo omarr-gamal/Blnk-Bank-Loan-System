@@ -1,9 +1,9 @@
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
-from api.models import Payment, Loan
+from api.models import Payment
 from api.serializers import PaymentSerializer
+from api.services import PaymentProcessor
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -31,7 +31,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         loan = serializer.validated_data["loan"]
         amount = serializer.validated_data["amount"]
 
-        Payment.objects.create(loan=loan, amount=amount)
-        loan.update_status()
+        payment = Payment.objects.create(loan=loan, amount=amount)
+        PaymentProcessor.process_payment(payment=payment)
 
         return Response({"detail": "Payment successful."}, status=201)
