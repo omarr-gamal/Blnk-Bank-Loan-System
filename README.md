@@ -67,6 +67,15 @@ These are great additions I found no time to implement:
 ## Considerations Taken
 
 - **Concurrent Runtime Enviroment**: The system is designed to handle concurrent requests and operations which handle financial transactions are wrapped in atomic transactions to ensure consistency and avoid race conditions.
+  
+  - **Atomic Transactions**:
+Financial transactions are wrapped in atomic transactions so that changes are treated as a single unit of work. If for example the process of allocating funds for a loan fails midway for any reason, then the entire transaction is rolled back, preventing partial updates.
+
+  - **Row-Level Locking**:
+To prevent race conditions when multiple loans try to use the same provider funds, the rows are locked during the operation so that no other transaction can use them until the current transaction is complete. This ensures that the allocation process is safe even in a multi-threaded environment.
+
+  - **In-place Field Updates with F()**:
+The F() expression is used to atomically update fields in place. So as to prevent race conditions from happening during high concurrency.
 
 ## Models
 
