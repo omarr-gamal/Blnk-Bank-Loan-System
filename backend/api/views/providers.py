@@ -31,7 +31,7 @@ class ProviderViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=False, methods=['patch'])
-    def update_current_user(self, request):
+    def update_current(self, request):
         """Allows the logged-in user to update their profile"""
         provider = get_object_or_404(LoanProvider, user=request.user)
         serializer = self.get_serializer(provider, data=request.data, partial=True)
