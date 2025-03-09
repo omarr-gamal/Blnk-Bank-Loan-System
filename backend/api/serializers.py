@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Loan, Payment, LoanFunding, LoanCustomer, LoanProvider
+from .models import Loan, Payment, LoanFunding, LoanCustomer, LoanProvider, BankConfig
 
 class LoanSerializer(serializers.HyperlinkedModelSerializer):
     remaining_balance = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True, source='get_remaining_balance')
@@ -89,3 +89,9 @@ class ProviderSerializer(serializers.HyperlinkedModelSerializer):
 
 class AddFundsSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+class BankConfigSerializer(serializers.Serializer):
+    min_loan_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    max_loan_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    interest_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
+    duration = serializers.DurationField()
