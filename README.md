@@ -14,6 +14,7 @@ The platform is built using Django and Django REST Framework (DRF). It follows a
 - **Bank Configuration**: Stores global loan settings like interest rates and durations.
 
 ## Loan Fulfillment Process
+
 1. **Loan Request:** A customer requests a loan specifying the amount.
 2. **Validation:** The system checks if the requested amount falls within the allowed range.
 3. **Funding Allocation:** Funds are allocated from available providers using the `LoanFundAllocator` service.
@@ -23,27 +24,49 @@ The platform is built using Django and Django REST Framework (DRF). It follows a
 If sufficient funds are unavailable, the loan request is rejected.
 
 ## Assumptions
-- A loan must be fully funded before being granted.
-- Customers repay loans in multiple payments until the balance reaches zero. 
-- Only one `BankConfig` instance exists, defining default loan parameters.
-- Providers pre-load funds into the platform for loans and have no control over loan interest rates, durations, or to whom their funds are lent.
+
+- Financial transactions are conducted in a single currency for simplicity. In real-world scenarios, currencies would be tracked, and amounts converted using exchange rates.
+- A loan must be fully funded before being granted. In other words there are no partial loan fulfilment.
+- Customers repay loans through multiple payments until the outstanding balance is fully paid.
+- Providers have no control over loan interest rates, durations, or e recipients of their funds.
+
+## Omissions: Non-Critical Heavy Lifting Tasks
+
+These tasks were omitted to focus on core loan management functionality, and also to save time.
+
+- Job scheduling for payment reminders, and marking overdue and default loans.
+- Payment gateway integration for actual payment processing.
+- Currency conversion and exchange rate handling.
+- Detailed user profile management beyond basic information.
 
 ## Design Choices
+
 ### **1. Separate Services for Business Logic**
+
 - **`LoanFundAllocator`**: Handles loan funding by distributing available funds from providers.
 - **`PaymentProcessor`**: Handles loan repayments and updates provider wallet balances.
 
 ### **2. Atomic Transactions**
+
 - Loan funding and repayment operations are wrapped in transactions to ensure data consistency.
 
 ### **3. Read-Optimized API Design**
+
 - API responses include computed fields (`remaining_balance`, `amount_due`, `total_paid`) for convenience.
 - A single `BankConfig` instance is exposed via a dedicated read-only API.
 
-## Future Enhancements
-- Dynamic interest rates per provider
-- Partial loan funding and batch approvals
-- Notifications for due payments
+## Future Improvements
+
+These are great additions I found no time to implement:
+
+- Queueing unfunded loans for future funding: The way it is currently implemented, if a loan is not fully funded, it is rejected and it's up to the customer to reapply. A future enhancement could be to queue such loans for funding when more funds become available.
+- Interest accrual on unpaid balances: Currently, the system does not accrue interest on unpaid loan balances. This could be added to reflect real-world loan scenarios where interest accumulates on overdue amounts.
+- Payment schedules: Implementing payment schedules would allow customers to repay loans in installments over time.
+- Calculate and use credit scores: Credit scores could be calculated from customer loan-taking behavior and used to prioritize loan fulfilment, adjust interest rates, increase loan limits, etc.
+
+## Considerations Taken
+
+- **Concurrent Runtime Enviroment**: The system is designed to handle concurrent requests and operations which handle financial transactions are wrapped in atomic transactions to ensure consistency and avoid race conditions.
 
 ## Models
 
