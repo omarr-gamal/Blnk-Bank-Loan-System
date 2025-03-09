@@ -11,7 +11,7 @@ class Loan(models.Model):
         PAID = 'paid', 'Paid'
         OVERDUE = 'overdue', 'Overdue'
         DEFAULTED = 'defaulted', 'Defaulted'
-        
+
     customer = models.ForeignKey(LoanCustomer, on_delete=models.CASCADE, related_name='loans')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     duration = models.DurationField()
@@ -30,6 +30,7 @@ class Loan(models.Model):
         return self.amount_due - self.get_total_paid()
 
     def update_status(self):
+        previous_status = self.status
         total_paid = self.get_total_paid()
 
         if self.status == Loan.Status.DEFAULTED or self.status == Loan.Status.PAID:
@@ -43,6 +44,10 @@ class Loan(models.Model):
             self.status = Loan.Status.PENDING_REPAYMENT
 
         self.save()
+        
+        if previous_status != Loan.Status.PAID and self.status == Loan.Status.PAID:
+            # TODO: Update provider wallet amounts.
+            pass
 
     def __str__(self):
         return f"Loan {self.id} - {self.amount} ({self.get_status_display()})"
