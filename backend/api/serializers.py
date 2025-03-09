@@ -20,7 +20,10 @@ class LoanFundingSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 class PaymentSerializer(serializers.HyperlinkedModelSerializer):
-    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    amount = serializers.DecimalField(
+        max_digits=12, decimal_places=2, 
+        help_text="Amount to repay for a loan."
+    )
     
     class Meta:
         model = Payment

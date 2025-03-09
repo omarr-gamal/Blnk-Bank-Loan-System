@@ -15,10 +15,10 @@ class LoanViewSet(viewsets.ModelViewSet):
         return Loan.objects.filter(customer__user=self.request.user)
 
     def perform_create(self, serializer):
+        """Create a new loan and allocate funds from providers."""
         customer = LoanCustomer.objects.get(user=self.request.user)
         amount = serializer.validated_data['amount']
         
-        # Check if amount is within customer's allowed range
         if amount < customer.min_loan_amount or amount > customer.max_loan_amount:
             raise serializers.ValidationError(f"Loan amount not within allowed range. Min: {customer.min_loan_amount}, Max: {customer.max_loan_amount}")
         
@@ -42,7 +42,6 @@ class LoanViewSet(viewsets.ModelViewSet):
                     break
 
             if remaining > 0:
-                # Not enough funds; raising an error will roll back transaction.
                 raise serializers.ValidationError("Not enough provider funds available.")
 
             # Update locked rows and create funding records.

@@ -7,6 +7,16 @@ from api.serializers import PaymentSerializer
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
+    """
+    This endpoint allows the logged-in customer to make a loan repayment.
+    
+    To submit a payment, provide:
+    - `loan`: ID of the loan being paid
+    - `amount`: Amount to repay
+
+    The response confirms successful payment processing.
+    """
+
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -15,7 +25,6 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return Payment.objects.filter(loan__customer__user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        """Allows the logged-in customer to make a loan repayment."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

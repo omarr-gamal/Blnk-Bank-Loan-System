@@ -25,16 +25,16 @@ class ProviderViewSet(viewsets.ModelViewSet):
         return LoanProvider.objects.filter(user=self.request.user)
     
     @action(detail=True, methods=['get'])
-    def get_customer_by_id(self, request, pk=None):
+    def get_provider_by_id(self, request, pk=None):
         provider = get_object_or_404(LoanProvider, pk=pk)
-        serializer = ProviderSerializer(provider)  # Use the correct serializer
+        serializer = ProviderSerializer(provider)
         return Response(serializer.data)
     
     @action(detail=False, methods=['patch'])
     def update_current_user(self, request):
         """Allows the logged-in user to update their profile"""
-        customer = get_object_or_404(LoanProvider, user=request.user)
-        serializer = self.get_serializer(customer, data=request.data, partial=True)
+        provider = get_object_or_404(LoanProvider, user=request.user)
+        serializer = self.get_serializer(provider, data=request.data, partial=True)
         
         if serializer.is_valid():
             serializer.save()
@@ -44,8 +44,7 @@ class ProviderViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def add_funds(self, request):
-        """Allows the logged-in provider to add funds for lending"""
-        
+        """Allows the logged-in provider to add funds to their account"""
         serializer = AddFundsSerializer(data=request.data)
         if serializer.is_valid():
             amount = serializer.validated_data['amount']

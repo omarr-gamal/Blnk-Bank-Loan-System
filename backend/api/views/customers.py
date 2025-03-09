@@ -14,14 +14,14 @@ class CustomerViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return LoanCustomer.objects.filter(user=self.request.user)
     
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], description="Retrieve the customer's profile")
     def get_customer_by_id(self, request, pk=None):
         """Returns a specific customer by ID"""
         customer = get_object_or_404(LoanCustomer, pk=pk)
         serializer = self.get_serializer(customer)
         return Response(serializer.data)
     
-    @action(detail=False, methods=['patch'])
+    @action(detail=False, methods=['patch'], description="Update the customer's profile")
     def update_current_user(self, request):
         """Allows the logged-in user to update their profile"""
         customer = get_object_or_404(LoanCustomer, user=request.user)
