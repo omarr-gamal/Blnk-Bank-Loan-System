@@ -2,32 +2,49 @@ from rest_framework import serializers
 from .models import Loan, Payment, LoanFunding, LoanCustomer, LoanProvider
 
 class LoanSerializer(serializers.HyperlinkedModelSerializer):
+    remaining_balance = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True, source='get_remaining_balance')
+    amount_due = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    total_paid = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True, source='get_total_paid')
+    
     class Meta:
         model = Loan
         fields = '__all__'
-        read_only_fields = ['duration', 'interest_rate', 'created_at', 'status']
+        read_only_fields = [
+            'duration', 'interest_rate', 'created_at', 'status', 'customer', 
+            'amount_due', 'remaining_balance', 'total_paid' 
+        ]
 
 class LoanFundingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = LoanFunding
         fields = '__all__'
 
-    # def validate(self, data):
-    #     provider = data['provider']
-    #     loan = data['loan']
-    #     amount = data['amount']
-    #     if amount > provider.available_funds():
-    #         raise serializers.ValidationError("Provider does not have enough available funds")
-    #     remaining = loan.amount - loan.total_funded()
-    #     if amount > remaining:
-    #         raise serializers.ValidationError("Funding amount exceeds remaining loan amount")
-    #     return data
-
 class PaymentSerializer(serializers.HyperlinkedModelSerializer):
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    
     class Meta:
         model = Payment
         fields = '__all__'
+        read_only_fields = ['payment_date']
 
+    def validate(self, data):
+        loan: Loan = data["loan"]
+        amount = data["amount"]
+        
+        request_user = self.context["request"].user
+        if loan.customer.user != request_user:
+            raise serializers.ValidationError("You can only pay back your own loans.")
+
+        if loan.status == Loan.Status.PAID:
+            raise serializers.ValidationError("This loan has already been paid off.")
+        if loan.status == Loan.Status.DEFAULTED:
+            raise serializers.ValidationError("This loan has been defaulted.")
+
+        if amount > loan.get_remaining_balance():
+            raise serializers.ValidationError("Payment amount exceeds the remaining balance.")
+
+        return data
+        
 
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
     first_name = serializers.CharField(source="user.first_name", required=False)
@@ -47,7 +64,6 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
         user.save()
 
         return super().update(instance, validated_data)
-
 
 class ProviderSerializer(serializers.HyperlinkedModelSerializer):
     first_name = serializers.CharField(source="user.first_name", required=False)
