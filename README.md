@@ -126,7 +126,7 @@ First, clone the project repository to your local machine:
 
 ```bash
 git clone <repository-url>
-cd <project-directory>
+cd <project-directory>/backend
 ```
 
 ### 2. Set Up the Environment
