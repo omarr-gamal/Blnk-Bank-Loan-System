@@ -28,7 +28,7 @@ If sufficient funds are unavailable, the loan request is rejected.
 - Financial transactions are conducted in a single currency for simplicity. In real-world scenarios, currencies would be tracked, and amounts converted using exchange rates.
 - A loan must be fully funded before being granted. In other words there are no partial loan fulfilment.
 - Customers repay loans through multiple payments until the outstanding balance is fully paid.
-- Providers have no control over loan interest rates, durations, or e recipients of their funds.
+- Providers have no control over loan interest rates, durations, or recipients of their funds.
 
 ## Omissions: Non-Critical Heavy Lifting Tasks
 
